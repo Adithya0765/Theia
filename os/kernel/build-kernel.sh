@@ -11,11 +11,16 @@ LIMINE_VER="7.12.0"
 CACHE="$ROOT/.cache/limine-$LIMINE_VER"
 
 mkdir -p "$OUT" "$ROOT/.cache"
-if [ ! -d "$CACHE" ]; then
-  echo "[k0] fetching Limine $LIMINE_VER..."
-  wget -qO "$ROOT/.cache/limine.tar.gz" \
-    "https://github.com/limine-bootloader/limine/releases/download/v$LIMINE_VER/limine-$LIMINE_VER.tar.gz"
-  mkdir -p "$CACHE" && tar -xzf "$ROOT/.cache/limine.tar.gz" -C "$CACHE" --strip-components=1
+# Binary release (prebuilt BIOS/UEFI shims + deploy tool + protocol header),
+# NOT the source tarball. Re-fetch if the cache predates this logic.
+if [ ! -f "$CACHE/.ok" ]; then
+  echo "[k0] fetching Limine $LIMINE_VER (binary)..."
+  rm -rf "$CACHE"
+  mkdir -p "$CACHE"
+  wget -qO "$ROOT/.cache/limine-bin.tar.gz" \
+    "https://github.com/limine-bootloader/limine/releases/download/v$LIMINE_VER/limine-$LIMINE_VER-binary.tar.gz"
+  tar -xzf "$ROOT/.cache/limine-bin.tar.gz" -C "$CACHE" --strip-components=1
+  touch "$CACHE/.ok"
 fi
 
 for tool in gcc nasm ld xorriso qemu-system-x86_64; do
