@@ -1,0 +1,13 @@
+#!/bin/sh
+# homestead-session — starts the Homestead userspace stack.
+# Stage 0: banner + Python prototype smoke check.
+# Stage 2+: launches compositor, then ShortcutDaemon/Index/notifications.
+set -eu
+echo "[homestead-session] starting consistency + personalization layers..."
+if command -v python3 >/dev/null 2>&1 && [ -d /usr/lib/homestead ]; then
+	PYTHONPATH=/usr/lib/homestead python3 -m unittest discover \
+		-s /usr/lib/homestead-tests 2>&1 | tail -5 || true
+fi
+echo "[homestead-session] stage 0: no compositor yet — dropping to shell."
+echo " Next: wlroots session wires in here (see docs/architecture-v2.md stage 2)."
+exec /bin/sh

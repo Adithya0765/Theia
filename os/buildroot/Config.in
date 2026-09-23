@@ -1,0 +1,4 @@
+# Homestead OS Buildroot external packages.
+menu "Homestead packages"
+	source "$BR2_EXTERNAL_HOMESTEAD_PATH/package/homestead-session/Config.in"
+endmenu

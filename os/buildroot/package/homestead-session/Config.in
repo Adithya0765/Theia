@@ -1,0 +1,6 @@
+config BR2_PACKAGE_HOMESTEAD_SESSION
+	bool "homestead-session (consistency + personalization userspace)"
+	depends on BR2_PACKAGE_PYTHON3
+	help
+	  Ships src/homestead prototype + init/session scripts as the
+	  Homestead session layer (stage 1+). Compositor wires in later.

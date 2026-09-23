@@ -1,0 +1,6 @@
+# Homestead fstab — live ISO (root on sr0), tmpfs scratch.
+# Real disk installer (stage 3) rewrites this for /dev/sda1.
+/dev/sr0  /        iso9660  ro              0 0
+tmpfs     /tmp     tmpfs    mode=1777       0 0
+tmpfs     /run     tmpfs    mode=0755       0 0
+devpts    /dev/pts devpts   gid=5,mode=620  0 0

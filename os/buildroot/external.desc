@@ -1,0 +1,2 @@
+name: HOMESTEAD
+desc: Homestead OS Buildroot external tree (ground-up userspace, kernel as HAL)

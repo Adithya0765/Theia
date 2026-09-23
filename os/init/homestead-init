@@ -1,0 +1,33 @@
+#!/bin/sh
+# homestead-init — stage-0/1 PID 1. POSIX sh only, no bashisms.
+# Job: mount essentials, coldplug devices via eudev, start session.
+# Later rewrite in C as a real supervisor; the contract (mounts, then
+# /usr/bin/homestead-session, tty1 shell fallback) stays stable.
+set -eu
+
+mount -t proc proc /proc 2>/dev/null || true
+mount -t sysfs sysfs /sys 2>/dev/null || true
+mount -t devtmpfs devtmpfs /dev 2>/dev/null || true
+mkdir -p /dev/pts /dev/shm /run
+mount -t devpts devpts /dev/pts 2>/dev/null || true
+mount -t tmpfs tmpfs /run 2>/dev/null || true
+
+hostname -F /etc/hostname 2>/dev/null || true
+
+# Device coldplug (needs eudev in image; harmless if absent)
+/lib/systemd/systemd-udevd --daemon 2>/dev/null || udevd --daemon 2>/dev/null || true
+udevadm trigger --action=add 2>/dev/null || true
+udevadm settle 2>/dev/null || true
+
+# Session layer: daemons -> compositor -> shell. Never fatal to boot.
+if [ -x /usr/bin/homestead-session ]; then
+	/usr/bin/homestead-session &
+fi
+
+echo ""
+echo " Homestead OS (stage 0) — homestead-init as PID 1."
+echo " Type 'homestead-session' to start the session, 'poweroff' to halt."
+echo ""
+
+# Keep a debug shell on tty1 so a failed session never bricks the boot.
+exec /bin/sh
