@@ -26,7 +26,9 @@ for tool in gcc nasm ld xorriso qemu-system-x86_64; do
 done
 
 echo "[k0] compiling..."
-cp "$CACHE/limine.h" "$KDIR/limine.h"
+LIMINE_H="$(find "$CACHE" -name 'limine.h' | head -1)"
+[ -n "$LIMINE_H" ] || { echo "limine.h not found under $CACHE" >&2; exit 1; }
+cp "$LIMINE_H" "$KDIR/limine.h"
 cc -c "$KDIR/kernel.c" -o "$OUT/kernel.o" -std=gnu11 -ffreestanding \
   -fno-stack-protector -fno-stack-check -fno-lto -fno-pie -fno-pic \
   -m64 -march=x86-64 -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
@@ -38,14 +40,21 @@ echo "[k0] building ISO..."
 rm -rf "$OUT/iso" && mkdir -p "$OUT/iso/boot/limine" "$OUT/iso/boot"
 cp "$OUT/homestead.elf" "$OUT/iso/boot/"
 cp "$KDIR/limine.cfg" "$OUT/iso/boot/limine/"
-cp "$CACHE/limine-bios.sys" "$CACHE/limine-bios-cd.bin" \
-   "$CACHE/limine-uefi-cd.bin" "$OUT/iso/boot/limine/"
+for f in limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin; do
+  src="$(find "$CACHE" -name "$f" | head -1)"
+  [ -n "$src" ] || { echo "$f not found under $CACHE" >&2; exit 1; }
+  cp "$src" "$OUT/iso/boot/limine/"
+done
+LIMINE_BIN="$(find "$CACHE" -type f -name 'limine' -executable | head -1)"
+[ -n "$LIMINE_BIN" ] || LIMINE_BIN="$(find "$CACHE" -type f -name 'limine' | head -1)"
+[ -n "$LIMINE_BIN" ] || { echo "limine deploy binary not found under $CACHE" >&2; exit 1; }
 xorriso -as mkisofs -R -r -J -b boot/limine/limine-bios-cd.bin \
   -no-emul-boot -boot-load-size 4 -boot-info-table -hfsplus \
   --efi-boot boot/limine/limine-uefi-cd.bin -efi-boot-part \
   --efi-boot-image --protective-msdos-label \
   "$OUT/iso" -o "$OUT/homestead-kernel.iso" 2>/dev/null
-"$CACHE/limine" bios-install "$OUT/homestead-kernel.iso" 2>/dev/null
+chmod +x "$LIMINE_BIN"
+"$LIMINE_BIN" bios-install "$OUT/homestead-kernel.iso" 2>/dev/null
 ls -lh "$OUT/homestead-kernel.iso"
 
 if [ "${1:-}" = "--qemu" ]; then
