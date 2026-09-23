@@ -1,15 +1,16 @@
 # Product Requirements Document
 ## [Working Name: "Homestead OS"] — A Linux-Based Desktop OS Built for Attachment
 
-**Status:** Draft v0.2 (ground-up direction — supersedes v0.1 base-distro plan)
+**Status:** Draft v0.3 (own kernel — supersedes v0.2 Linux-kernel plan)
 **Owner:** [You]
 **Last updated:** 2026-09-23
 
-> v0.2 direction change: no Debian/Fedora base, no systemd. Upstream LTS
-> kernel is borrowed as the driver HAL; everything above it (rootfs via
-> Buildroot, `homestead-init`, session, toolkit) is Homestead-owned.
-> See `docs/architecture-v2.md` and `os/`. VirtualBox ISO first, then disk
-> installer, then bare metal.
+> v0.3 direction change: Homestead owns the kernel. Linux source is
+> reference-only (ports imply GPL-2.0). Driver scope is virtual-hardware
+> first (virtio/AHCI/PS/2/framebuffer, phases K0–K2), one physical laptop
+> at K3, Wi-Fi/GPU-accel last. The v0.2 Linux-kernel Buildroot ISO stays
+> alive as the daily-drivable product surface until K2 self-hosts.
+> See `os/kernel/README.md`.
 
 > Naming note: "Homestead" is a placeholder capturing the thesis (you build a home in it, it's yours). Replace freely — see Open Questions.
 

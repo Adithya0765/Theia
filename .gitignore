@@ -9,6 +9,8 @@ venv/
 .cache/
 buildroot-*/
 output/
+output-homestead-kernel/
+os/kernel/limine.h
 *.iso
 *.squashfs
 *.vdi
